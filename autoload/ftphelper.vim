@@ -37,6 +37,9 @@ function ftphelper#GetIncludeRules()
 endfunction
 
 function ftphelper#PushFtpSingle(path)
+  if a:path == ".conn"
+    return
+  endif
   let conn = ftphelper#GetConfig()
   if type(conn) == v:t_list
     silent execute "!lftp -e \"put ".a:path." -o ".a:path."; exit;\" ftp://".conn[1].":".conn[2]."@".conn[0]
@@ -59,9 +62,6 @@ function ftphelper#PullFtp()
   if type(conn) == v:t_list
     let excludeSTR = ftphelper#GetExcludeRules()
     let includeSTR = ftphelper#GetIncludeRules()
-    echo conn
-    echo excludeSTR
-    echo includeSTR
     echo "Pulling ftp host ".conn[1]."@".conn[0]
     silent execute "!lftp -e \"mirror -ne --exclude-glob '*.*' ".excludeSTR." ".includeSTR." --use-pget-n=10 . .;exit;\" ftp://".conn[1].":".conn[2]."@".conn[0]
     echo "Download finished"
