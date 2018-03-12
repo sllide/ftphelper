@@ -52,7 +52,7 @@ function ftphelper#PushFtp()
     let excludeSTR = ftphelper#GetExcludeRules()
     let includeSTR = ftphelper#GetIncludeRules()
     echo "Pushing ftp host ".conn[1]."@".conn[0]
-    silent execute "!lftp -e \"mirror -Rne --exclude-glob '*.conn' ".excludeSTR." ".includeSTR." --use-pget-n=10 . .;exit;\" ftp://".conn[1].":".conn[2]."@".conn[0]
+    silent execute "!lftp -e \"mirror -Rn --exclude-glob '*.conn' ".excludeSTR." ".includeSTR." --use-pget-n=10 . .;exit;\" ftp://".conn[1].":".conn[2]."@".conn[0]
     echo "Upload finished"
   endif
 endfunction
@@ -63,7 +63,7 @@ function ftphelper#PullFtp()
     let excludeSTR = ftphelper#GetExcludeRules()
     let includeSTR = ftphelper#GetIncludeRules()
     echo "Pulling ftp host ".conn[1]."@".conn[0]
-    silent execute "!lftp -e \"mirror -ne --exclude-glob '*.*' ".excludeSTR." ".includeSTR." --use-pget-n=10 . .;exit;\" ftp://".conn[1].":".conn[2]."@".conn[0]
+    silent execute "!lftp -e \"mirror -n --exclude-glob '*.*' ".excludeSTR." ".includeSTR." --use-pget-n=10 . .;exit;\" ftp://".conn[1].":".conn[2]."@".conn[0]
     echo "Download finished"
   endif
 endfunction
