@@ -1,12 +1,25 @@
-function ftphelper#GetConfig()
+function! ftphelper#GetConfig()
   if filereadable('.conn')
     let connection = readfile('.conn')
-    return connection
+    if len(connection) == 5
+      return connection
+    endif
+    echo ".conn needs 5 lines: protocol, host, user, pass, directory"
+    return 0
   endif
   return 0
 endfunction
 
-function ftphelper#GetExcludeRules()
+function! ftphelper#IsPartOfProjectDir(path)
+  let pwd = getcwd()
+  let path = a:path
+  if filereadable(pwd.'/'.path)
+    return 1
+  endif
+  return 0
+endfunction
+
+function! ftphelper#GetExcludeRules()
   if exists("s:excludeList")
     return s:excludeList
   endif
@@ -21,7 +34,7 @@ function ftphelper#GetExcludeRules()
   return s:excludeList
 endfunction
 
-function ftphelper#GetIncludeRules()
+function! ftphelper#GetIncludeRules()
   if exists("s:includeList")
     return s:includeList
   endif
@@ -36,34 +49,36 @@ function ftphelper#GetIncludeRules()
   return s:includeList
 endfunction
 
-function ftphelper#PushFtpSingle(path)
+function! ftphelper#PushFtpSingle(path)
   if a:path == ".conn"
     return
   endif
   let conn = ftphelper#GetConfig()
   if type(conn) == v:t_list
-    silent execute "!lftp -e \"put ".a:path." -o ".a:path."; exit;\" ftp://".conn[1].":".conn[2]."@".conn[0]
+    if ftphelper#IsPartOfProjectDir(a:path)
+      silent execute "!lftp -e \"put ".a:path." -o ".conn[4].'/'.a:path."; exit;\" ".conn[0]."://".conn[2].":".conn[3]."@".conn[1]
+    endif
   endif
 endfunction
 
-function ftphelper#PushFtp()
+function! ftphelper#PushFtp()
   let conn = ftphelper#GetConfig()
   if type(conn) == v:t_list
     let excludeSTR = ftphelper#GetExcludeRules()
     let includeSTR = ftphelper#GetIncludeRules()
-    echo "Pushing ftp host ".conn[1]."@".conn[0]
-    silent execute "!lftp -e \"mirror -Rn --exclude-glob '*.conn' ".excludeSTR." ".includeSTR." --use-pget-n=10 . .;exit;\" ftp://".conn[1].":".conn[2]."@".conn[0]
+    echo "Pushing ".conn[0]." host ".conn[2]."@".conn[1]
+    execute "!lftp -e \"mirror -Rn --exclude-glob '*.conn' ".excludeSTR." ".includeSTR." --parallel=10 . ".conn[4].";exit;\" ".conn[0]."://".conn[2].":".conn[3]."@".conn[1]
     echo "Upload finished"
   endif
 endfunction
 
-function ftphelper#PullFtp()
+function! ftphelper#PullFtp()
   let conn = ftphelper#GetConfig()
   if type(conn) == v:t_list
     let excludeSTR = ftphelper#GetExcludeRules()
     let includeSTR = ftphelper#GetIncludeRules()
-    echo "Pulling ftp host ".conn[1]."@".conn[0]
-    silent execute "!lftp -e \"mirror -n --exclude-glob '*.*' ".excludeSTR." ".includeSTR." --use-pget-n=10 . .;exit;\" ftp://".conn[1].":".conn[2]."@".conn[0]
+    echo "Pulling ".conn[0]." host ".conn[2]."@".conn[1]
+    execute "!lftp -e \"mirror -n --exclude-glob '*.*' ".excludeSTR." ".includeSTR." --parallel=10 ".conn[4]." .;exit;\" ".conn[0]."://".conn[2].":".conn[3]."@".conn[1]
     echo "Download finished"
   endif
 endfunction
