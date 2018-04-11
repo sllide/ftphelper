@@ -8,11 +8,13 @@ Ftphelper is a plugin that solves some of the issues I had with ftp hosts. Using
 * lftp installed
 
 ## Usage
-To use Ftphelper a file named **.conn** needs to exist describing the connection info. host username and password in that order, on seperate lines.
+To use Ftphelper a file named **.conn** needs to exist describing the connection info. protocol, host, username, password and root dir in that order, on seperate lines.
 ```
-ftp.example.com
+sftp
+example.com
 user
 password123
+/var/www
 ```
 Having this file in the working directory will enable ftphelper.
 You can call :PullFtp to mirror the specified host and :PushFtp to upload all files with a newer timestamp than the remote file.
@@ -26,9 +28,9 @@ let g:ftphelper_includes = ['*.conf', '*.css', '*.html', '*.ini', '*.js', '*.jso
 ```
 
 ## Todo
-- [ ] Support more protocol types
+- [x] Support more protocol types
 - [ ] Add support for mirroring without includes (At the moment it ignores everything unless specified different in g:ftphelper_includes)
 - [x] Dont upload .conn on save
 - [x] Remove the hook function from autoload
-- [ ] Add check if file is part of the pwd. If not dont upload it.
+- [x] Add check if file is part of the pwd. If not dont upload it.
 - [ ] Write a vim doc file.
