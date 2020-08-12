@@ -56,7 +56,7 @@ function! ftphelper#PushFtpSingle(path)
   let conn = ftphelper#GetConfig()
   if type(conn) == v:t_list
     if ftphelper#IsPartOfProjectDir(a:path)
-      silent execute "!lftp -e \"put ".a:path." -o ".conn[4].'/'.a:path."; exit;\" ".conn[0]."://".conn[2].":".conn[3]."@".conn[1]
+      silent execute "!lftp -e \"put ".a:path." -o ".conn[4].'/'.a:path."; exit;\" \"".conn[0]."://".conn[2].":".conn[3]."@".conn[1]."\""
     endif
   endif
 endfunction
@@ -67,7 +67,7 @@ function! ftphelper#PushFtp()
     let excludeSTR = ftphelper#GetExcludeRules()
     let includeSTR = ftphelper#GetIncludeRules()
     echo "Pushing ".conn[0]." host ".conn[2]."@".conn[1]
-    execute "!lftp -e \"mirror -Rn --exclude-glob '*.conn' ".excludeSTR." ".includeSTR." --parallel=10 . ".conn[4].";exit;\" ".conn[0]."://".conn[2].":".conn[3]."@".conn[1]
+    execute "!lftp -e \"mirror -Rn --exclude-glob '*.conn' ".excludeSTR." ".includeSTR." --parallel=10 . ".conn[4].";exit;\" \"".conn[0]."://".conn[2].":".conn[3]."@".conn[1]."\""
     echo "Upload finished"
   endif
 endfunction
@@ -78,7 +78,7 @@ function! ftphelper#PullFtp()
     let excludeSTR = ftphelper#GetExcludeRules()
     let includeSTR = ftphelper#GetIncludeRules()
     echo "Pulling ".conn[0]." host ".conn[2]."@".conn[1]
-    execute "!lftp -e \"mirror -n --exclude-glob '*.*' ".excludeSTR." ".includeSTR." --parallel=10 ".conn[4]." .;exit;\" ".conn[0]."://".conn[2].":".conn[3]."@".conn[1]
+    execute "!lftp -e \"mirror -n --exclude-glob '*.*' ".excludeSTR." ".includeSTR." --parallel=10 ".conn[4]." .;exit;\" \"".conn[0]."://".conn[2].":".conn[3]."@".conn[1]."\""
     echo "Download finished"
   endif
 endfunction
